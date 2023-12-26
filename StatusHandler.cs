@@ -40,12 +40,13 @@ namespace PunishBot
         {
             if (new Random().Next(1, 100) == 1)
             {
+                await Logger.Log(LogSeverity.Info, "StatusHandler", "Super secret Cupcake status striggered");
                 await _client.SetCustomStatusAsync("Vibing with Cupcake");
                 return;
             }
 
             var nextStatus = statusList.Where(x => x != currentStatus).PickRandom();
-            Console.WriteLine($"[General/Info] {DateTime.Now} Updating Status {currentStatus} -> {nextStatus}");
+            await Logger.Log(LogSeverity.Info, "StatusHandler", $"Updating Status {currentStatus} -> {nextStatus}");
             currentStatus = nextStatus;
             await _client.SetCustomStatusAsync(currentStatus);
         }
