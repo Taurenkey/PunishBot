@@ -9,20 +9,16 @@ using System.Threading.Tasks;
 
 namespace PunishBot.Commands
 {
-    public class CommandHandler
+    public class CommandHandler(DiscordSocketClient client, Logger logger)
     {
-        private readonly DiscordSocketClient _client;
-        public readonly CommandService _commands;
+        private readonly DiscordSocketClient _client = client;
+        private readonly CommandService _commands = new();
+        private readonly Logger _logger = logger;
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands)
-        {
-            _commands = commands;
-            _client = client;
-        }
-
-        public async Task InstallCommandsAsync()
+        public async Task Setup()
         {
             _client.MessageReceived += HandleCommandAsync;
+            _commands.Log += Logger.Log;
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                                             services: null);
         }
@@ -30,8 +26,7 @@ namespace PunishBot.Commands
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a system message
-            var message = messageParam as SocketUserMessage;
-            if (message == null) return;
+            if (messageParam is not SocketUserMessage message) return;
 
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
